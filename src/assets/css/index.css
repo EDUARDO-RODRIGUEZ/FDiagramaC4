@@ -1,0 +1,24 @@
+
+*{
+    font-family: 'Oswald', sans-serif;  
+} 
+
+.bg-custom{
+    background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
+    color: #fff;
+}
+.vh100{
+    min-height: 100vh;
+}
+
+.h100{
+    height: 100%;
+}
+.card-auth{
+    height: 450px;
+    width: 400px;
+}
+
+.img-medium{
+    height: 200px;
+}
