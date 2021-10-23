@@ -7,6 +7,11 @@
     background-image: linear-gradient(to right, #243949 0%, #517fa4 100%);
     color: #fff;
 }
+.bg-content{
+    background-color: #f4f6f9;
+    color: black;
+}
+
 .vh100{
     min-height: 100vh;
 }
@@ -21,4 +26,32 @@
 
 .img-medium{
     height: 200px;
+}
+
+.section{
+    height: 500px;
+}
+
+.sidebar{
+    position: fixed;
+    width: 300px;
+    left: 0;
+    transition: all .5s;
+}
+
+.sidebar-hide{
+    left: -300px;
+}
+
+.menu{
+    color:white;
+    left: 0;
+}
+
+.pointer{
+    cursor: pointer;
+}
+
+.board{
+    height: 600px;
 }
