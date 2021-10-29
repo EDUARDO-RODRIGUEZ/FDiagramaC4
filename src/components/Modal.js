@@ -3,11 +3,12 @@ import { useDiagrama } from '../hooks/useDiagrama';
 import { FormContainer } from './FormContainer';
 import { FormContainerDB } from './FormContainerDB';
 import FormPerson from './FormPerson';
+import { FormRelation } from './FormRelation';
 import { FormSystemExtern } from './FormSystemExtern';
 
 const Modal = (props) => {
 
-    const { type, DrawDiagram } = props;
+    const { type, DrawDiagram, setSourceRel, sourceRel } = props;
 
     return (
         <div className="modal fade" id="modal-create" aria-hidden="true">
@@ -22,7 +23,7 @@ const Modal = (props) => {
                     </div>
 
                     <div className="modal-body">
-                        <RenderSwitch type={type} DrawDiagram={DrawDiagram} />
+                        <RenderSwitch type={type} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} sourceRel={sourceRel} />
                     </div>
 
                 </div>
@@ -34,9 +35,9 @@ const Modal = (props) => {
 
 const RenderSwitch = (props) => {
 
-    const { DrawContainer, DrawContainerDB, DrawSystemExtern, DrawPerson } = useDiagrama();
+    const { DrawContainer, DrawContainerDB, DrawSystemExtern, DrawPerson, DrawRelation } = useDiagrama();
 
-    const { type, DrawDiagram } = props;
+    const { type, DrawDiagram, setSourceRel, sourceRel } = props;
 
 
     switch (type) {
@@ -44,16 +45,19 @@ const RenderSwitch = (props) => {
             return <div className='text-center'><span className="text-center spinner-border text-primary" /></div>;
 
         case "person":
-            return <FormPerson DrawPerson={DrawPerson} DrawDiagram={DrawDiagram} />;
+            return <FormPerson DrawPerson={DrawPerson} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />;
 
         case "container":
-            return <FormContainer DrawContainer={DrawContainer} DrawDiagram={DrawDiagram} />;
+            return <FormContainer DrawContainer={DrawContainer} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />;
 
         case "system_extern":
-            return <FormSystemEtern DrawSystemExtern={DrawSystemExtern} DrawDiagram={DrawDiagram} />
+            return <FormSystemExtern DrawSystemExtern={DrawSystemExtern} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />
 
         case "containerDB":
-            return <FormContainerDB DrawContainerDB={DrawContainerDB} DrawDiagram={DrawDiagram} />
+            return <FormContainerDB DrawContainerDB={DrawContainerDB} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />
+
+        case "DrawRelation":
+            return <FormRelation DrawRelation={DrawRelation} DrawDiagram={DrawDiagram} sourceRel={sourceRel} />
 
         default:
             return <small>error</small>;

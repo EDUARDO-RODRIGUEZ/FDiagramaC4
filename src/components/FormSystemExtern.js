@@ -1,10 +1,14 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { useParams } from 'react-router';
+import socketContext from '../context/socketContext';
 import { useForm } from '../hooks/useForm';
 
 export const FormSystemExtern = (props) => {
     //@params : id, title, description
 
-    const { DrawSystemExtern, DrawDiagram } = props;
+    const { DrawSystemExtern, DrawDiagram, setSourceRel } = props;
+    const { socket } = useContext(socketContext);
+    const { idsala } = useParams();
 
     const { value, HandleInputChange, reset } = useForm({
         id: "",
@@ -16,7 +20,17 @@ export const FormSystemExtern = (props) => {
 
     const HandleClikSubmit = (e) => {
         e.preventDefault();
+
+        setSourceRel((rels) => [...rels, id]);
+
         DrawDiagram(DrawSystemExtern(id, title, description));
+
+        socket.emit("draw-figure", {
+            idsala,
+            element: "DrawSystemExtern",
+            params: [id, title, description]
+        });
+
         reset();
     }
 

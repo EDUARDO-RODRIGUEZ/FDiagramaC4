@@ -16,27 +16,53 @@ export const AuthContextProvider = ({ children }) => {
 
     const [authState, dispatch] = useReducer(authReducer, authInitialState);
 
-    const login = async (email, password) => {
+    const login = async (email, password, callback) => {
 
         const res = await apiDiagrama("/user/login", "POST", { email, password });
 
         if (res.errors || !res.ok) {
-            return false;
+            callback(true);
+            return;
         }
 
+        callback(false);
+
         const { data } = res;
+
+        localStorage.setItem("keyID", btoa(JSON.stringify({ id: data._id })));
 
         dispatch({
             type: types.authLogin,
             payload: { id: data._id, name: data.name, email: data.email }
         });
 
-        return true;
     }
 
     const logout = () => {
+
+        localStorage.removeItem("keyID");
+
         dispatch({
             type: types.authLogout
+        });
+    }
+
+    const createUser = async (name, email, password, callback) => {
+
+        const res = await apiDiagrama("/user/create", "POST", { name, email, password });
+
+        if (res.errors || !res.ok) {
+            callback(true);
+        }
+        callback(false);
+
+        const { data } = res;
+
+        localStorage.setItem("keyID", btoa(JSON.stringify({ id: data._id })));
+
+        dispatch({
+            type: types.authLogin,
+            payload: { id: data._id, name: data.name, email: data.email }
         });
     }
 
@@ -44,7 +70,9 @@ export const AuthContextProvider = ({ children }) => {
         <authContext.Provider value={{
             auth: authState,
             login,
-            logout
+            logout,
+            createUser,
+            dispatch
         }}>
             {children}
         </authContext.Provider>

@@ -1,11 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useForm } from '../hooks/useForm';
+import { socketContext } from '../context/socketContext';
+import { useParams } from 'react-router';
 
 const FormPerson = (props) => {
 
     //@params : id, title, description
 
-    const { DrawPerson, DrawDiagram } = props;
+    const { DrawPerson, DrawDiagram, setSourceRel } = props;
+    const { socket } = useContext(socketContext);
+    const { idsala } = useParams();
 
     const { value, HandleInputChange, reset } = useForm({
         id: "",
@@ -16,8 +20,19 @@ const FormPerson = (props) => {
     const { id, title, description } = value;
 
     const HandleClikSubmit = (e) => {
+
         e.preventDefault();
+
+        setSourceRel((rels) => [...rels, id]);
+
         DrawDiagram(DrawPerson(id, title, description));
+
+        socket.emit("draw-figure", {
+            idsala,
+            element: "DrawPerson",
+            params: [id, title, description]
+        });
+
         reset();
     }
 

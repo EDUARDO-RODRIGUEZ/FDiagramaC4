@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom';
 import imagenLogin from '../../assets/image/login.svg';
 import { authContext } from '../../context/authContext';
@@ -8,14 +8,15 @@ const LoginPage = () => {
 
     const { login } = useContext(authContext);
 
-    const { value, HandleInputChange } = useForm({ email: "", password: "" });
+    const { value, HandleInputChange } = useForm({ email: "ed@ed.com", password: "12345678" });
     const [error, seterror] = useState("");
     const { email, password } = value;
 
     const HandleLoginSubmit = async (e) => {
         e.preventDefault();
-        let response = await login(email, password);
-        seterror(response ? "" : "fallo en la validacion!!!");
+        await login(email, password, (err) => {
+            seterror(err ? "Error en la validacion !!!" : "");
+        });
     }
 
     return (

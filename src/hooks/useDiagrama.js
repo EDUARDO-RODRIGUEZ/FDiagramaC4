@@ -1,4 +1,4 @@
-import React from 'react'
+import { useCallback } from "react";
 
 export const useDiagrama = () => {
 
@@ -22,12 +22,31 @@ export const useDiagrama = () => {
         return `Person(${id},${title},"${description}")\n`;
     }
 
+    const executeDraw = useCallback((name, params) => {
+        switch (name) {
+            case "DrawPerson":
+                return DrawPerson(...params);
+            case "DrawContainer":
+                return DrawContainer(...params);
+            case "DrawContainerDB":
+                return DrawContainerDB(...params);
+            case "DrawSystemExtern":
+                return DrawSystemExtern(...params);
+            case "DrawRelation":
+                return DrawRelation(...params);
+            default:
+                console.log("Error nombre useDiagram");
+                return "";
+        }
+    }, []);
+
     return {
         DrawContainer,
         DrawContainerDB,
         DrawSystemExtern,
         DrawRelation,
-        DrawPerson
+        DrawPerson,
+        executeDraw
     }
 
 }
