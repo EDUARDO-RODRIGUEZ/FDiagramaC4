@@ -1,44 +1,47 @@
 import React, { useContext } from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import socketContext from '../context/socketContext';
 import { useForm } from '../hooks/useForm';
 
-export const FormContainer = (props) => {
+export const FormSystemBoundary = (props) => {
 
-    //@params : id, title, tecnologia, description
+    //@params : id, title
 
-    const { DrawContainer, DrawDiagram, setSourceRel } = props;
-    const { idsala } = useParams();
+    const { DrawDiagram, setSourceRel } = props;
     const { socket } = useContext(socketContext);
+    const { idsala } = useParams();
 
     const { value, HandleInputChange, reset } = useForm({
         id: "",
         title: "",
-        tecnologia: "",
-        description: ""
     });
 
-    const { id, title, tecnologia, description } = value;
+    const { id, title } = value;
 
     const HandleClikSubmit = (e) => {
+
         e.preventDefault();
 
-        setSourceRel((rels) => [...rels, id]);
+        let limit = "limit" + id;
 
-        DrawDiagram(DrawContainer(id, title, tecnologia, description));
+        setSourceRel((rels) => [...rels, limit]);
+
+        DrawDiagram("", { id: limit, title });
 
         socket.emit("draw-figure", {
             idsala,
-            element: "DrawContainer",
-            params: [id, title, tecnologia, description],
-            idElement: id
+            element: "DrawSystemBoundary",
+            params: [limit, title],
+            idElement: limit
         });
 
         reset();
+
     }
 
     return (
         <form onSubmit={HandleClikSubmit}>
+
             <div className='my-2'>
                 <input
                     type='text'
@@ -61,32 +64,11 @@ export const FormContainer = (props) => {
             </div>
 
             <div className='my-2'>
-                <input
-                    type='text'
-                    placeholder='tecnologia'
-                    className='form-control'
-                    value={tecnologia}
-                    name="tecnologia"
-                    onChange={HandleInputChange}
-                />
-            </div>
-
-            <div className='my-2'>
-                <input
-                    type='text'
-                    placeholder='description'
-                    className='form-control'
-                    value={description}
-                    name="description"
-                    onChange={HandleInputChange}
-                />
-            </div>
-
-            <div className='my-2'>
                 <button type="button" className="btn btn-secondary mx-1" data-bs-dismiss="modal">Close</button>
                 <button className="btn btn-primary mx-1" data-bs-dismiss="modal" >Save</button>
             </div>
 
         </form>
-    );
+    )
+
 }

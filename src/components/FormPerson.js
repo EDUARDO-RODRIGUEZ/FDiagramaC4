@@ -30,7 +30,8 @@ const FormPerson = (props) => {
         socket.emit("draw-figure", {
             idsala,
             element: "DrawPerson",
-            params: [id, title, description]
+            params: [id, title, description],
+            idElement: id
         });
 
         reset();
@@ -41,7 +42,7 @@ const FormPerson = (props) => {
             <div className='my-2'>
                 <input
                     type='text'
-                    placeholder='id'
+                    placeholder='idName'
                     className='form-control'
                     value={id}
                     name="id"

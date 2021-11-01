@@ -43,6 +43,10 @@
     left: -300px;
 }
 
+.content-sidebar{
+    height: 400px;
+}
+
 .menu{
     color:white;
     left: 0;
@@ -54,4 +58,11 @@
 
 .board{
     height: 600px;
+}
+
+/* Scroll*/
+.sidebar-scroll::-webkit-scrollbar {
+    width: 8px;    
+    background-color: #ccc;
+    border-radius: 10px;
 }

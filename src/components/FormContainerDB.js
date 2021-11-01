@@ -30,7 +30,8 @@ export const FormContainerDB = (props) => {
         socket.emit("draw-figure", {
             idsala,
             element: "DrawContainerDB",
-            params: [id, title, tecnologia, description]
+            params: [id, title, tecnologia, description],
+            idElement: id
         });
 
         reset();
@@ -41,7 +42,7 @@ export const FormContainerDB = (props) => {
             <div className='my-2'>
                 <input
                     type='text'
-                    placeholder='id'
+                    placeholder='idName'
                     className='form-control'
                     value={id}
                     name="id"

@@ -21,6 +21,7 @@ const BoardPage = () => {
     const { executeDraw } = useDiagrama();
     const { sala, error, isAnfitrion, validate } = useSala();
 
+    //Save DB
     const [sourceDiagram, setsourceDiagram] = useState("");
     const [sourceRel, setSourceRel] = useState([]);
 
@@ -34,7 +35,6 @@ const BoardPage = () => {
         settypeDiagram(type);
     }
 
-
     const FinalizarRoom = async () => {
 
         const res = await apiDiagrama(`/sala/finalize/${sala._id}`);
@@ -47,18 +47,71 @@ const BoardPage = () => {
         history.replace('/');
     }
 
-    const DrawDiagram = useCallback((element = "sdsd") => {
+    //Button Dowload
+    const HandleClickDowload = () => {
+        try {
+            fetch(refImage.current.src)
+                .then(resp => resp.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = "DiagramaC4";
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                });
+
+        } catch (errr) {
+            alert("Nose pudo descargar la imagen!!!");
+        }
+    }
+
+    //Button Borrar
+    const HandleBorraBoard = () => {
+        setsourceDiagram("");
+        setSourceRel([]);
+        DrawDiagram();
+        socket.emit("borrar-board", { idSala: sala._id });
+    }
+
+    const DrawDiagram = useCallback((element = "", SystemBoundary = null) => {
 
         let source = `@startuml\n!include C4_${typeDiagram}.puml\n`;
 
-        //Es asincrono
+        if (SystemBoundary) {
+
+            const { id, title } = SystemBoundary;
+
+            setsourceDiagram((sourceD) => {
+
+                let DrawSystem_Boundary = `System_Boundary(${id},"${title}"){\n` + sourceD + `}\n`;
+                source += DrawSystem_Boundary;
+                source += "@enduml";
+
+                console.log(source);
+
+                let data = textEncode(source);
+                let compressed = pako.deflate(data, { level: 9, to: 'string' });
+                let result = btoa(compressed).replace(/\+/g, '-').replace(/\//g, '_');
+                refImage.current.src = `https://kroki.io/plantuml/svg/${result}`;
+
+                return DrawSystem_Boundary;
+            })
+
+            return;
+        }
+
 
         setsourceDiagram((sourceD) => {
 
             source += sourceD;
-
             source += element;
+
             source += "@enduml";
+
+            console.log(source);
 
             let data = textEncode(source);
             let compressed = pako.deflate(data, { level: 9, to: 'string' });
@@ -70,15 +123,18 @@ const BoardPage = () => {
 
     }, [typeDiagram]);
 
-    useEffect(() => {
-
-        if (refImage.current) {
-            console.log("ref")
-            DrawDiagram();
+    // Save Data Board
+    const HandleSaveBoard = async () => {
+        const res = await apiDiagrama(`/sala/setData/${sala._id}`, "POST", { board: sourceDiagram, links: sourceRel });
+        if (!res.ok) {
+            alert("No se pudo guardar la data !!!");
+            return;
         }
+        alert("Se guardo los datos de la pizarra !!!")
+    }
 
-    }, [DrawDiagram]);
 
+    // Solicitud Anfitrion [On]
     useEffect(() => {
 
         socket.on('solicitud-anfitrion', (args) => {
@@ -96,6 +152,8 @@ const BoardPage = () => {
 
     }, [socket])
 
+
+    // Agregar ala sala join para que escuchen events [emit]
     useEffect(() => {
 
         (sala) && socket.emit('agregar-sala', { idSala: sala._id })
@@ -103,6 +161,7 @@ const BoardPage = () => {
     }, [socket, sala]);
 
 
+    //Close Sala [On]
     useEffect(() => {
 
         socket.on('close-sala', (args) => {
@@ -116,24 +175,115 @@ const BoardPage = () => {
 
     }, [socket, history]);
 
-    // DrawDiagram
+
+    //Borrar Board [On]
+    useEffect(() => {
+
+        socket.on("borrar-board-client", () => {
+            setsourceDiagram("");
+            setSourceRel([]);
+            DrawDiagram();
+        });
+
+        return () => {
+            socket.removeAllListeners("borrar-board-client");
+        }
+
+    }, [socket]);
+
+    // Draw Figure [On]
 
     useEffect(() => {
 
         socket.on("draw-figure-sala", (args) => {
 
-            console.log(args);
-            const { element, params } = args
+            // params[0] :id
+            const { element, params, idElement } = args;
+
+            if (idElement) {
+                setSourceRel((rel) => [...rel, idElement]);
+            }
+
+            if (element === "DrawSystemBoundary") {
+                const [id, title] = params;
+                DrawDiagram("", { id, title });
+                return;
+            }
+
             DrawDiagram(executeDraw(element, params));
 
         });
 
         return () => {
-            socket.removeAllListeners("close-sala");
+            socket.removeAllListeners("draw-figure-sala");
         }
 
-    }, [socket, executeDraw, DrawDiagram])
+    }, [socket, executeDraw, DrawDiagram]);
 
+
+    // Ejecuta cuado se cambia typeDiagram
+    // Se carga los datos guardados de la sala 
+
+    useEffect(() => {
+
+        if (sala && refImage.current) {
+            setsourceDiagram(sala.board);
+            setSourceRel(sala.links);
+            DrawDiagram();
+        }
+
+    }, [sala, DrawDiagram]);
+
+    // Eliminar element [On]
+
+    useEffect(() => {
+
+        socket.on("eliminar-element-client", (args) => {
+
+            const { idElement } = args;
+
+            let regexFind = new RegExp(`\\S*${idElement}\\S*\n`, "gi");
+            let regexCierre = new RegExp(`}\n`, "gi");
+
+            if (idElement.includes('limit')) {
+
+                setsourceDiagram((dataSource) => {
+
+                    let res = dataSource.replace(regexFind, "");
+                    res = res.replace(regexCierre, "")
+                    console.log(res);
+                    return res;
+
+                });
+
+            } else {
+
+                setsourceDiagram((dataSource) => {
+
+                    let res = dataSource.replace(regexFind, "");
+                    console.log(res);
+                    return res;
+
+                });
+
+            }
+
+            // Eliminando id 
+            setSourceRel((ArrayIds) => {
+                let idFilters = ArrayIds.filter((idRel) => idRel !== idElement);
+                return idFilters;
+            });
+
+            // Params por Defecto
+            DrawDiagram();
+
+        })
+
+        return () => {
+            socket.removeAllListeners("eliminar-element-client");
+        }
+
+    }, [socket, DrawDiagram]);
 
     if (validate) {
         return <h5 className='text-center'>Cargando !!!</h5>
@@ -142,7 +292,6 @@ const BoardPage = () => {
     if (error.length > 0) {
         return <h5 className='text-center'>{error}</h5>
     }
-
 
     return (
 
@@ -179,18 +328,18 @@ const BoardPage = () => {
                             (isAnfitrion)
                                 ?
                                 <>
-                                    <button className='btn btn-primary mx-1'>Guardar</button>
-                                    <button className='btn btn-danger mx-1'>Borrar</button>
-                                    <button className='btn btn-success mx-1'>Imprimir</button>
+                                    <button onClick={HandleSaveBoard} className='btn btn-primary mx-1'>Guardar</button>
+                                    <button onClick={HandleBorraBoard} className='btn btn-danger mx-1'>Borrar</button>
+                                    <button onClick={HandleClickDowload} className='btn btn-success mx-1'>Imprimir</button>
                                     <button onClick={FinalizarRoom} className='btn btn-dark mx-1'>Finalizar reunion</button>
                                 </>
-                                : <button className='btn btn-success mx-1'>Imprimir</button>
+                                : <button onClick={HandleClickDowload} className='btn btn-success mx-1'>Imprimir</button>
                         }
                     </div>
 
                 </section>
 
-                <Modal type={typeModal} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} sourceRel={sourceRel} />
+                <Modal type={typeModal} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} sourceRel={sourceRel} setsourceDiagram={setsourceDiagram} />
 
             </div>
         </>

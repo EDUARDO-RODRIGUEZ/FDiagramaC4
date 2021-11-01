@@ -1,14 +1,17 @@
 import React from 'react'
 import { useDiagrama } from '../hooks/useDiagrama';
+import { FormComponent } from './FormComponent';
 import { FormContainer } from './FormContainer';
 import { FormContainerDB } from './FormContainerDB';
+import { FormDelete } from './FormDelete';
 import FormPerson from './FormPerson';
 import { FormRelation } from './FormRelation';
+import { FormSystemBoundary } from './FormSystemBoundary';
 import { FormSystemExtern } from './FormSystemExtern';
 
 const Modal = (props) => {
 
-    const { type, DrawDiagram, setSourceRel, sourceRel } = props;
+    const { type, DrawDiagram, setSourceRel, sourceRel, setsourceDiagram } = props;
 
     return (
         <div className="modal fade" id="modal-create" aria-hidden="true">
@@ -23,7 +26,7 @@ const Modal = (props) => {
                     </div>
 
                     <div className="modal-body">
-                        <RenderSwitch type={type} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} sourceRel={sourceRel} />
+                        <RenderSwitch type={type} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} sourceRel={sourceRel} setsourceDiagram={setsourceDiagram} />
                     </div>
 
                 </div>
@@ -35,9 +38,9 @@ const Modal = (props) => {
 
 const RenderSwitch = (props) => {
 
-    const { DrawContainer, DrawContainerDB, DrawSystemExtern, DrawPerson, DrawRelation } = useDiagrama();
+    const { DrawContainer, DrawContainerDB, DrawSystemExtern, DrawPerson, DrawRelation, DrawComponent } = useDiagrama();
 
-    const { type, DrawDiagram, setSourceRel, sourceRel } = props;
+    const { type, DrawDiagram, setSourceRel, sourceRel, setsourceDiagram } = props;
 
 
     switch (type) {
@@ -56,7 +59,16 @@ const RenderSwitch = (props) => {
         case "containerDB":
             return <FormContainerDB DrawContainerDB={DrawContainerDB} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />
 
-        case "DrawRelation":
+        case "component":
+            return <FormComponent DrawComponent={DrawComponent} DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />
+
+        case "SystemBoundary":
+            return <FormSystemBoundary DrawDiagram={DrawDiagram} setSourceRel={setSourceRel} />
+
+        case "Eliminar":
+            return <FormDelete sourceRel={sourceRel} setSourceRel={setSourceRel} DrawDiagram={DrawDiagram} setsourceDiagram={setsourceDiagram} />
+
+        case "Relation":
             return <FormRelation DrawRelation={DrawRelation} DrawDiagram={DrawDiagram} sourceRel={sourceRel} />
 
         default:

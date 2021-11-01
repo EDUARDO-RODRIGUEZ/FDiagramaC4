@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import socketContext from '../context/socketContext';
 import { useForm } from '../hooks/useForm';
 
-export const FormContainer = (props) => {
+export const FormComponent = (props) => {
 
     //@params : id, title, tecnologia, description
 
-    const { DrawContainer, DrawDiagram, setSourceRel } = props;
+    const { DrawComponent, DrawDiagram, setSourceRel } = props;
     const { idsala } = useParams();
     const { socket } = useContext(socketContext);
 
@@ -25,11 +25,11 @@ export const FormContainer = (props) => {
 
         setSourceRel((rels) => [...rels, id]);
 
-        DrawDiagram(DrawContainer(id, title, tecnologia, description));
+        DrawDiagram(DrawComponent(id, title, tecnologia, description));
 
         socket.emit("draw-figure", {
             idsala,
-            element: "DrawContainer",
+            element: "DrawComponent",
             params: [id, title, tecnologia, description],
             idElement: id
         });
@@ -60,6 +60,7 @@ export const FormContainer = (props) => {
                 />
             </div>
 
+
             <div className='my-2'>
                 <input
                     type='text'
@@ -88,5 +89,6 @@ export const FormContainer = (props) => {
             </div>
 
         </form>
-    );
+    )
+
 }

@@ -28,7 +28,8 @@ export const FormSystemExtern = (props) => {
         socket.emit("draw-figure", {
             idsala,
             element: "DrawSystemExtern",
-            params: [id, title, description]
+            params: [id, title, description],
+            idElement: id
         });
 
         reset();
@@ -39,7 +40,7 @@ export const FormSystemExtern = (props) => {
             <div className='my-2'>
                 <input
                     type='text'
-                    placeholder='id'
+                    placeholder='idName'
                     className='form-control'
                     value={id}
                     name="id"

@@ -1,6 +1,6 @@
-import React from 'react'
-// import { useParams } from 'react-router';
-// import socketContext from '../context/socketContext';
+import React, { useContext } from 'react'
+import { useParams } from 'react-router';
+import socketContext from '../context/socketContext';
 import { useForm } from '../hooks/useForm';
 
 
@@ -9,8 +9,8 @@ export const FormRelation = (props) => {
     // @params startId, endId, tecnologia
 
     const { DrawRelation, DrawDiagram, sourceRel } = props;
-    // const { socket } = useContext(socketContext);
-    // const { idsala } = useParams();
+    const { socket } = useContext(socketContext);
+    const { idsala } = useParams();
 
     const { value, HandleInputChange, reset } = useForm({
         start: "option",
@@ -22,7 +22,15 @@ export const FormRelation = (props) => {
 
     const HandleClikSubmit = (e) => {
         e.preventDefault();
-        DrawDiagram(DrawRelation(start, end, comment))
+        DrawDiagram(DrawRelation(start, end, comment));
+
+        socket.emit("draw-figure", {
+            idsala,
+            element: "DrawRelation",
+            params: [start, end, comment],
+            idElement: null
+        });
+
         reset();
     }
 
