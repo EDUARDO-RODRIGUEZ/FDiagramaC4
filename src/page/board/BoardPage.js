@@ -90,8 +90,6 @@ const BoardPage = () => {
                 source += DrawSystem_Boundary;
                 source += "@enduml";
 
-                console.log(source);
-
                 let data = textEncode(source);
                 let compressed = pako.deflate(data, { level: 9, to: 'string' });
                 let result = btoa(compressed).replace(/\+/g, '-').replace(/\//g, '_');
@@ -110,8 +108,6 @@ const BoardPage = () => {
             source += element;
 
             source += "@enduml";
-
-            console.log(source);
 
             let data = textEncode(source);
             let compressed = pako.deflate(data, { level: 9, to: 'string' });
@@ -251,7 +247,6 @@ const BoardPage = () => {
 
                     let res = dataSource.replace(regexFind, "");
                     res = res.replace(regexCierre, "")
-                    console.log(res);
                     return res;
 
                 });
@@ -261,7 +256,6 @@ const BoardPage = () => {
                 setsourceDiagram((dataSource) => {
 
                     let res = dataSource.replace(regexFind, "");
-                    console.log(res);
                     return res;
 
                 });

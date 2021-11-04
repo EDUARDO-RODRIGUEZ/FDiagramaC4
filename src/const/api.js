@@ -1,3 +1,3 @@
 export const Api = {
-    url: "http://localhost:8000"
+    url: "http://54.233.112.2:8000"
 }

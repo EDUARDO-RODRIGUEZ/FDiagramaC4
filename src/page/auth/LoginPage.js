@@ -8,7 +8,7 @@ const LoginPage = () => {
 
     const { login } = useContext(authContext);
 
-    const { value, HandleInputChange } = useForm({ email: "ed@ed.com", password: "12345678" });
+    const { value, HandleInputChange } = useForm({ email: "", password: "" });
     const [error, seterror] = useState("");
     const { email, password } = value;
 
