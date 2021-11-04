@@ -189,7 +189,7 @@ const BoardPage = () => {
             socket.removeAllListeners("borrar-board-client");
         }
 
-    }, [socket]);
+    }, [socket, DrawDiagram]);
 
     // Draw Figure [On]
 
@@ -320,7 +320,7 @@ const BoardPage = () => {
                 <section className='row mt-3'>
 
                     <div className='col-12 col-md-10 mx-auto shadow board text-center'>
-                        <img ref={refImage} src={"x"} alt={"C4 diagramas"} />
+                        <img ref={refImage} src={"x"} alt={"C4 diagramas"} className={(sourceRel.length) > 2 ? "h-100" : ""} />
                     </div>
 
                     <div className='col-12 col-md-10 mx-auto p-2'>
